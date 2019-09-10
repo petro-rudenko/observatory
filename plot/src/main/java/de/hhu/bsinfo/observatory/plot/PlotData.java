@@ -2,7 +2,6 @@ package de.hhu.bsinfo.observatory.plot;
 
 import com.google.common.math.Quantiles;
 import com.google.common.math.Stats;
-import de.erichseifert.gral.data.DataTable;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
@@ -66,7 +65,7 @@ class PlotData {
                 LOGGER.info("Calculating values for '{}/{}/{}'", name, entry.getKey(), fileEntry.getKey());
 
                 String name = fileEntry.getKey().substring(0, fileEntry.getKey().lastIndexOf('.'));
-                dataMap.get(entry.getKey()).put(name, generateDataTable(fileEntry.getValue()));
+                dataMap.get(entry.getKey()).put(name, generateDataTable(name, fileEntry.getValue()));
             }
         }
     }
@@ -103,10 +102,11 @@ class PlotData {
         return dataMap.get(measurement).get(benchmarkName);
     }
 
-    @SuppressWarnings("unchecked")
-    private DataTable generateDataTable(List<File> dataFiles) throws IOException {
+    private DataTable generateDataTable(String name, List<File> dataFiles) throws IOException {
         DataTable ret = new DataTable(Double.class, Double.class, Double.class);
         Map<Double, List<Double>> valueMap = new HashMap<>();
+
+        ret.setName(name);
 
         for(File dataFile : dataFiles) {
             BufferedReader reader = new BufferedReader(new FileReader(dataFile));

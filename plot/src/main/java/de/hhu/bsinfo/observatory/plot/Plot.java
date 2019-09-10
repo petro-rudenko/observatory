@@ -4,16 +4,19 @@ import de.erichseifert.gral.data.Column;
 import de.erichseifert.gral.data.statistics.Statistics;
 import de.erichseifert.gral.graphics.Insets2D;
 import de.erichseifert.gral.graphics.Label;
+import de.erichseifert.gral.graphics.Orientation;
 import de.erichseifert.gral.plots.XYPlot;
 import de.erichseifert.gral.data.DataSource;
 import de.erichseifert.gral.plots.axes.AxisRenderer;
 import de.erichseifert.gral.plots.axes.LogarithmicRenderer2D;
+import java.awt.font.TextAttribute;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
 class Plot extends XYPlot {
 
-    Plot(DataSource[] data) {
+    Plot(DataSource[] data, String name) {
         super(data);
 
         AxisRenderer xRenderer = new LogarithmicRenderer2D();
@@ -34,6 +37,22 @@ class Plot extends XYPlot {
         setAxisRenderer(XYPlot.AXIS_X, xRenderer);
         getAxis(XYPlot.AXIS_X).setRange(0, xData.getStatistics(Statistics.MAX) + 1);
         getAxis(XYPlot.AXIS_X).setAutoscaled(false);
+
+        for(DataSource source : data) {
+            getLegend().remove(source);
+        }
+
+        Label nameLabel = new Label(name);
+        nameLabel.setFont(nameLabel.getFont().deriveFont((Collections.singletonMap(TextAttribute.WEIGHT, TextAttribute.WEIGHT_BOLD))));
+
+        getLegend().add(nameLabel);
+
+        for(DataSource source : data) {
+            getLegend().add(source);
+        }
+
+        getLegend().setOrientation(Orientation.VERTICAL);
+        setLegendVisible(true);
 
         setInsets(new Insets2D.Double(20, 120, 60, 20));
     }

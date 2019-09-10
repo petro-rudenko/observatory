@@ -37,10 +37,10 @@ class PlotPanel extends JPanel {
     private static final HashMap<String, Color> COLOR_MAP = new HashMap<>();
     private static final Random COLOR_RANDOMIZER = new Random();
 
-    private final Stack<Color> COLORS = new Stack<Color>() {{
-        Color.decode("#8dd3c7"); Color.decode("#ffffb3"); Color.decode("#bebada"); Color.decode("#fb8072");
-        Color.decode("#80b1d3"); Color.decode("#fdb462"); Color.decode("#b3de69"); Color.decode("#fccde5");
-        Color.decode("#d9d9d9"); Color.decode("#bc80bd"); Color.decode("#ccebc5"); Color.decode("#ffed6f"); }};
+    private static final Stack<Color> COLORS = new Stack<Color>() {{
+        push(Color.decode("#ffff99")); push(Color.decode("#cab2d6")); push(Color.decode("#fdbf6f")); push(Color.decode("#fb9a99"));
+        push(Color.decode("#b2df8a")); push(Color.decode("#a6cee3")); push(Color.decode("#b15928")); push(Color.decode("#6a3d9a"));
+        push(Color.decode("#ff7f00")); push(Color.decode("#e31a1c")); push(Color.decode("#33a02c")); push(Color.decode("#1f78b4")); }};
 
     private final File dataDirectory;
 
@@ -88,16 +88,22 @@ class PlotPanel extends JPanel {
 
             XYPlot plot;
 
+            String[] namePart1 = dataDirectory.getName().split("(?<=[a-z])(?=[A-Z])");
+            String[] namePart2 = measurement.split("(?<=[a-z])(?=[A-Z])");
+            String name = String.join(" ", Arrays.copyOfRange(namePart1, 0, namePart1.length - 1))
+                    .concat(" - ")
+                    .concat(String.join(" ", namePart2));
+
             if(measurement.equals("DataOverheadFactor")) {
-                plot = new ThroughputPlot(data, "Data Overhead Factor", "");
+                plot = new ThroughputPlot(data, name, "Data Overhead Factor", "");
             } else {
                 if(dataDirectory.getName().toLowerCase().contains("throughput")) {
                     if(measurement.equals("DataThroughput")) {
-                        plot = new ThroughputPlot(data, "Data Throughput", "B/s");
+                        plot = new ThroughputPlot(data, name, "Data Throughput", "B/s");
                     } else if(measurement.equals("OperationThroughput")) {
-                        plot = new ThroughputPlot(data, "Operation Throughput", "Op/s");
+                        plot = new ThroughputPlot(data, name, "Operation Throughput", "Op/s");
                     } else if(measurement.equals("DataThroughputOverhead")) {
-                        plot = new ThroughputPlot(data, "Data Throughput Overhead", "B/s");
+                        plot = new ThroughputPlot(data, name, "Data Throughput Overhead", "B/s");
                     } else {
                         continue;
                     }
@@ -106,7 +112,7 @@ class PlotPanel extends JPanel {
                         continue;
                     }
 
-                    plot = new LatencyPlot(data);
+                    plot = new LatencyPlot(data, name);
                 } else {
                     continue;
                 }
@@ -158,8 +164,11 @@ class PlotPanel extends JPanel {
                     pointRenderer.setErrorColumnBottom(2);
                     pointRenderer.setErrorColumnTop(2);
                     pointRenderer.setErrorVisible(true);
+
+                    plot.getLegend().refresh();
                 } else {
                     plot.remove(plotData.getData(measurement, checkBox.getText()));
+                    plot.getLegend().refresh();
                 }
 
                 graphPanel.repaint();
@@ -173,7 +182,7 @@ class PlotPanel extends JPanel {
             JButton saveButton = new JButton("Save plot");
 
             saveButton.addActionListener(e -> {
-                File file = new File("plot/" + tabbedPane.getTitleAt(tabbedPane.getSelectedIndex()) + "." + formatBox.getSelectedItem());
+                File file = new File("plot/" + dataDirectory.getName() + "/" + tabbedPane.getTitleAt(tabbedPane.getSelectedIndex()) + "." + formatBox.getSelectedItem());
                 if(!file.getParentFile().exists()) {
                     if(!file.getParentFile().mkdirs()) {
                         LOGGER.error("Unable to create folder '{}'", file.getParentFile().getPath());
