@@ -19,14 +19,11 @@ import javax.swing.UIManager;
 class JCheckBoxList extends JList<JCheckBox> {
 
     JCheckBoxList(String[] objects) {
-        JCheckBox[] checkBoxes = new JCheckBox[objects.length];
-
-        for(int i = 0; i < objects.length; i++) {
-            checkBoxes[i] = new JCheckBox(objects[i]);
-        }
-
         DefaultListModel<JCheckBox> model = new DefaultListModel<>();
-        model.addAll(Arrays.asList(checkBoxes));
+
+        for (String object : objects) {
+            model.addElement(new JCheckBox(object));
+        }
 
         setModel(model);
 

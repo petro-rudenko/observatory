@@ -6,5 +6,6 @@ include 'socket-binding'
 include 'disni-binding'
 include 'neutrino-binding'
 include 'jverbs-binding'
+include 'jucx-binding'
 include 'plot'
 
